@@ -55,52 +55,31 @@ exports.createUser = async (req, res, next) => {
 exports.loginUser = async (req, res, next) => {
   let email = req.body.email;
   let passwd = req.body.passwd;
-  let token = req.body.token;
 
-  if (token != null) {
-    let query = `SELECT lu.*, lt.token
-                    FROM lcp_user AS lu
-                    LEFT JOIN lcp_token AS lt
-                      ON lu.id = lt.user_id
-                  WHERE token = ?`;
-    let data = [token];
-    try {
-      [rows] = await connection.query(query, data);
-      res.status(200).json({ success: true, result: rows });
-    } catch (e) {
-      res.status(500).json();
+  let query = `select * from lcp_user where email = ?`;
+  let data = [email];
+  let user_id;
+  try {
+    [rows] = await connection.query(query, data);
+    let hashedPasswd = rows[0].passwd;
+    user_id = rows[0].id;
+    const isMatch = await bcrypt.compare(passwd, hashedPasswd);
+    if (isMatch == false) {
+      res.status(401).json();
       return;
     }
-  } else {
-    let query = `select * from lcp_user where email = ? `;
-    let data = [email];
-
-    let user_id;
-    try {
-      [rows] = await connection.query(query, data);
-      let hashedPasswd = rows[0].passwd;
-      user_id = rows[0].id;
-      const isMatch = await bcrypt.compare(passwd, hashedPasswd);
-      if (isMatch == false) {
-        res.status(401).json();
-        return;
-      }
-    } catch (e) {
-      res.status(500).json();
-      return;
-    }
-    const token = jwt.sign(
-      { user_id: user_id },
-      process.env.ACCESS_TOKEN_SECRET
-    );
-    query = `insert into lcp_token (token, user_id) values (?, ?)`;
-    data = [token, user_id];
-    try {
-      [result] = await connection.query(query, data);
-      res.status(200).json({ success: true, token: token });
-    } catch (e) {
-      res.status(500).json({ e });
-    }
+  } catch (e) {
+    res.status(500).json();
+    return;
+  }
+  const token = jwt.sign({ user_id: user_id }, process.env.ACCESS_TOKEN_SECRET);
+  query = `insert into lcp_token (token, user_id) values (?, ?)`;
+  data = [token, user_id];
+  try {
+    [result] = await connection.query(query, data);
+    res.status(200).json({ success: true, token: token });
+  } catch (e) {
+    res.status(500).json({ e });
   }
 };
 
