@@ -29,14 +29,14 @@ exports.createUser = async (req, res, next) => {
     console.log(result);
     user_id = result.insertId;
   } catch (e) {
-    res.status(500).json({ hi: 1, e });
+    res.status(500);
     return;
   }
 
   // 토큰 처리  npm jsonwebtoken
   // 토큰 생성 sign
   const token = jwt.sign({ user_id: user_id }, process.env.ACCESS_TOKEN_SECRET);
-  query = "insert into lcp_token (token, user_id) values (? , ? )";
+  query = `insert into lcp_token (token, user_id) values (? , ? )`;
   data = [token, user_id];
 
   try {
