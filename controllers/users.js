@@ -71,6 +71,7 @@ exports.loginUser = async (req, res, next) => {
     }
   } catch (e) {
     res.status(500).json();
+    console.log(error1);
     return;
   }
   const token = jwt.sign({ user_id: user_id }, process.env.ACCESS_TOKEN_SECRET);
