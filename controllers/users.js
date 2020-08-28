@@ -56,7 +56,7 @@ exports.loginUser = async (req, res, next) => {
   let email = req.body.email;
   let passwd = req.body.passwd;
 
-  let query = "select * from lcp_user where email = ? ";
+  let query = `select * from lcp_user where email = ? `;
   let data = [email];
 
   let user_id;
@@ -74,7 +74,7 @@ exports.loginUser = async (req, res, next) => {
     return;
   }
   const token = jwt.sign({ user_id: user_id }, process.env.ACCESS_TOKEN_SECRET);
-  query = "insert into lcp_token (token, user_id) values (?, ?)";
+  query = `insert into lcp_token (token, user_id) values (?, ?)`;
   data = [token, user_id];
   try {
     [result] = await connection.query(query, data);
