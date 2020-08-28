@@ -1,7 +1,7 @@
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const path = require("path");
+//데이터베이스연결
 const connection = require("../db/mysql_connection");
 
 // @desc    회원가입
