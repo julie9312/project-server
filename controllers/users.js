@@ -20,19 +20,16 @@ exports.createUser = async (req, res, next) => {
   // npm bcryptjs
   const hashedPasswd = await bcrypt.hash(passwd, 8);
 
-  let query = "insert into lcp_user (email, passwd) values ( ? , ? )";
+  let query = `insert into lcp_user (email, passwd) values ("${email}" , "${hashedPasswd}")`;
   let data = [email, hashedPasswd];
   let user_id;
 
-  const conn = await connection.getConnection();
-  await conn.beginTransaction();
-
   try {
-    [result] = await conn.query(query, data);
+    [result] = await connection.query(query);
+    console.log(result);
     user_id = result.insertId;
   } catch (e) {
-    await conn.rollback();
-    res.status(500).json();
+    res.status(500).json({ hi: 1, e });
     return;
   }
 
@@ -43,15 +40,11 @@ exports.createUser = async (req, res, next) => {
   data = [token, user_id];
 
   try {
-    [result] = await conn.query(query, data);
+    [result] = await connection.query(query, data);
   } catch (e) {
-    await conn.rollback();
-    res.status(500).json();
+    res.status(500).json({ hi: 2, e });
     return;
   }
-
-  await conn.commit();
-  await conn.release();
 
   res.status(200).json({ success: true, token: token });
 };

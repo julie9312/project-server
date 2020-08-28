@@ -1,12 +1,10 @@
 const express = require("express");
 const dotenv = require("dotenv");
-
+dotenv.config({ path: "./config/config.env" });
 const path = require("path");
 
 const users = require("./routes/users");
 const memo = require("./routes/memos");
-
-dotenv.config({ path: "./config/config.env" });
 
 const app = express();
 
