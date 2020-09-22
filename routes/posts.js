@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const {
-  allPost,
+  getAllPost,
   createPost,
   updatePost,
   deletePost,
 } = require("../controllers/posts");
 
-router.route("/").get(allPost).post(createPost);
+router.route("/").get(getAllPost).post(createPost);
 
 router.route("/:id").put(updatePost).delete(deletePost);
 

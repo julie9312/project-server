@@ -5,7 +5,7 @@ const connection = require("../db/mysql_connection");
 // @route   GET /api/v1/post
 // 1. 데이터베이스에 접속해서, 쿼리한다.
 // 2. 그 결과를 res 에 담아서 보내준다.
-exports.allPost = function (req, res, next) {
+exports.getAllPost = function (req, res, next) {
   let query = "select * from lcp_post;";
   connection.query(query, function (error, results, fields) {
     console.log(error);
