@@ -2,11 +2,11 @@
 const connection = require("../db/mysql_connection");
 
 // @desc    모든 메모 가져오기
-// @route   GET /api/v1/memos
+// @route   GET /api/v1/post
 // 1. 데이터베이스에 접속해서, 쿼리한다.
 // 2. 그 결과를 res 에 담아서 보내준다.
-exports.getMemos = function (req, res, next) {
-  let query = "select * from lcp_memo;";
+exports.allPost = function (req, res, next) {
+  let query = "select * from lcp_post;";
   connection.query(query, function (error, results, fields) {
     console.log(error);
     res.status(200).json({
@@ -19,33 +19,33 @@ exports.getMemos = function (req, res, next) {
 };
 
 // @desc    메모 생성하기
-// @route   POST /api/v1/memos
-// @body    {title:"안녕", comment:"좋다"}
-exports.createMemo = (req, res, next) => {
+// @route   POST /api/v1/post
+// @body    {title:"안녕", body:"좋다"}
+exports.createPost = (req, res, next) => {
   let title = req.body.title;
-  let comment = req.body.comment;
-  let query = "insert into lcp_memo (title, comment) values (? , ?) ";
-  connection.query(query, [title, comment], function (error, results, fields) {
+  let body = req.body.body;
+  let query = "insert into lcp_post (title, body) values (? , ?) ";
+  connection.query(query, [title, body], function (error, results, fields) {
     console.log(results);
     res.status(200).json({ success: true });
   });
 };
 
 // @desc    메모 수정하기
-// @route   PUT /api/v1/memos/:id
-// @body    {title:"안녕", comment:"좋다"}
-exports.updateMemo = function (req, res, next) {
+// @route   PUT /api/v1/posts/:id
+// @body    {title:"안녕", body:"좋다"}
+exports.updatePost = function (req, res, next) {
   let id = req.params.id;
   let title = req.body.title;
-  let comment = req.body.comment;
+  let body = req.body.body;
 
-  let query = `update lcp_memo 
+  let query = `update lcp_post 
                 set title = "${title}", 
-                comment = "${comment}" 
+                body = "${body}" 
                 where id = ${id} `;
 
-  let query2 = "update lcp_memo set title = ? , comment = ? where id = ?";
-  connection.query(query2, [title, comment, id], function (
+  let query2 = "update lcp_post set title = ? , body = ? where id = ?";
+  connection.query(query2, [title, body, id], function (
     error,
     results,
     fields
@@ -56,11 +56,11 @@ exports.updateMemo = function (req, res, next) {
 };
 
 // @desc    메모 삭제하기
-// @route   DELETE /api/v1/memos/:id
-exports.deleteMemo = (req, res, next) => {
+// @route   DELETE /api/v1/posts/:id
+exports.deletePost = (req, res, next) => {
   let id = req.params.id;
 
-  let query = `delete from lcp_memo where id = ${id}`;
+  let query = `delete from lcp_post where id = ${id}`;
 
   connection.query(query, function (error, results, fields) {
     console.log(results);
