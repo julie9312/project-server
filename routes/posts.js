@@ -7,6 +7,7 @@ const {
   deletePost,
 } = require("../controllers/posts");
 
+// api/v1/post
 router.route("/").get(getAllPost).post(createPost);
 
 router.route("/:id").put(updatePost).delete(deletePost);

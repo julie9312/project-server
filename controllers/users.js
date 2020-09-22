@@ -98,6 +98,6 @@ exports.logout = async (req, res, next) => {
     [result] = await connection.query(query, data);
     res.status(200).json({ success: true });
   } catch (e) {
-    res.status(500).json();
+    res.status(555).json();
   }
 };
