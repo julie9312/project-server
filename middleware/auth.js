@@ -20,12 +20,13 @@ const auth = async (req, res, next) => {
     return;
   }
 
-  let query =
-    "select u.id, u.email, t.token \
-                from lcp_token as t \
-                join lcp_user as u \
-                on t.user_id = u.id \
-                where t.user_id = ? and t.token = ? ";
+  let query = `select u.id, t.user_id, p.id
+    from lcp_user as u
+    join lcp_token as t 
+    on t.user_id = u.id
+    join lcp_post as p
+    on t.user_id = p.id;`;
+
   let data = [user_id, token];
 
   try {

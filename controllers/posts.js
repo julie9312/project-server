@@ -6,9 +6,8 @@ const connection = require("../db/mysql_connection");
 // 1. 데이터베이스에 접속해서, 쿼리한다.
 // 2. 그 결과를 res 에 담아서 보내준다.
 exports.getAllPost = async (req, res, next) => {
-  let user_id = req.user_id.id;
-
-  let query = "select * from lcp_post where user_id = ?;";
+  let user_id = req.user.id;
+  let query = "select * from lcp_post where id = ?;";
   let data = [user_id];
   try {
     [rows] = await connection.query(query, data);
@@ -24,10 +23,11 @@ exports.getAllPost = async (req, res, next) => {
 // @route   POST /api/v1/post
 // @body    {title:"안녕", body:"좋다"}
 exports.createPost = async (req, res, next) => {
+  let user_id = req.user.id;
   let title = req.body.title;
   let body = req.body.body;
   let query = "insert into lcp_post (title, body) values (? , ?) ";
-  let data = [title, body];
+  let data = [user_id, title, body];
 
   try {
     [rows] = await connection.query(query, data);
@@ -54,7 +54,7 @@ exports.updatePost = async (req, res, next) => {
 
   let query2 = "update lcp_post set title = ? , body = ? where id = ?";
 
-  let data = [id];
+  let data = [user_id, title, body];
   try {
     [result] = await connection.query(query, data);
     res.status(200).json({ success: true });
