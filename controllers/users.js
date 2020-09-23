@@ -84,7 +84,9 @@ exports.loginUser = async (req, res, next) => {
 };
 
 // @desc    로그아웃 (현재의 기기 1개에 대한 로그아웃)
-// @route   /api/v1/users/logout
+// @route   DELETE/api/v1/users/logout
+// @request user_id(auth)
+// @response  success
 
 exports.logout = async (req, res, next) => {
   // lcp_token 테이블에서, 토큰 삭제해야 로그아웃이 되는것이다.
