@@ -1,4 +1,5 @@
 const express = require("express");
+const auth = require("../middleware/auth");
 const router = express.Router();
 const {
   getAllPost,
@@ -8,8 +9,8 @@ const {
 } = require("../controllers/posts");
 
 // api/v1/post
-router.route("/").get(getAllPost).post(createPost);
+router.route("/").get(auth, getAllPost).post(auth, createPost);
 
-router.route("/:id").put(updatePost).delete(deletePost);
+router.route("/:id").put(auth, updatePost).delete(auth, deletePost);
 
 module.exports = router;
