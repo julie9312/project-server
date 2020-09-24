@@ -17,13 +17,11 @@ exports.getAllPost = async (req, res, next) => {
     res.status(200).json({ success: true, items: rows, cnt: rows.length });
     return;
   } catch (e) {
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "메모를 불러오지 못했습니다",
-        error: e,
-      });
+    res.status(500).json({
+      success: false,
+      message: "메모를 불러오지 못했습니다",
+      error: e,
+    });
     return;
   }
 };
@@ -42,9 +40,12 @@ exports.createPost = async (req, res, next) => {
     res.status(200).json({ success: true, result: result });
     return;
   } catch (e) {
-    res
-      .status(500)
-      .json({ success: false, message: "메모를 만들 수 없습니다.", error: e });
+    res.console.log(query);
+    status(500).json({
+      success: false,
+      message: "메모를 만들 수 없습니다.",
+      error: e,
+    });
     return;
   }
 };
