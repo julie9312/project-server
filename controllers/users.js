@@ -24,6 +24,9 @@ exports.createUser = async (req, res, next) => {
   let data = [email, hashedPasswd];
   let user_id;
 
+  const conn = await connection.getConnection();
+  await conn.beginTransaction();
+
   try {
     [result] = await connection.query(query);
     console.log(result);
@@ -45,6 +48,8 @@ exports.createUser = async (req, res, next) => {
     res.status(500).json({ hi: 2, e });
     return;
   }
+  await conn.commit();
+  await conn.release();
 
   res.status(200).json({ success: true, token: token });
 };
