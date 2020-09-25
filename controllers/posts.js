@@ -76,12 +76,12 @@ exports.updatePost = async (req, res, next) => {
     return;
   }
 
-  let query = `update lcp_post 
+  query = `update lcp_post 
                 set title = "${title}", 
                 body = "${body}" 
                 where id = ${id} `;
 
-  let data = [post_id, title, body];
+  data = [post_id, title, body];
   try {
     [result] = await connection.query(query, data);
     res.status(200).json({ success: true });
