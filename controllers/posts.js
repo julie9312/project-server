@@ -1,8 +1,8 @@
 // 데이터베이스 연결
 const connection = require("../db/mysql_connection");
 
-// @desc    모든 메모 가져오기
-// @route   GET /api/v1/posts/????offset=0&limit=25
+// @desc    내가 쓴 모든 메모 가져오기
+// @route   GET /api/v1/posts/me?offset=0&limit=25
 // @request user_id(auth), offset, limit
 // @response  success, items[], cnt
 // 1. 데이터베이스에 접속해서, 쿼리한다.
@@ -16,18 +16,14 @@ exports.getAllPost = async (req, res, next) => {
     res.status(400).json({ message: "파라미터가 잘 못 되었습니다." });
     return;
   }
-  let query = `select * from lcp_post where id = ? limit ? ,? ;`;
+  let query = `select * from lcp_post where user_id = ? limit ? ,? ;`;
   let data = [user_id, Number(offset), Number(limit)];
   try {
     [rows] = await connection.query(query, data);
     res.status(200).json({ success: true, items: rows, cnt: rows.length });
     return;
   } catch (e) {
-    res.status(500).json({
-      success: false,
-      message: "메모를 불러오지 못했습니다",
-      error: e,
-    });
+    res.status(500).json();
     return;
   }
 };
@@ -39,7 +35,7 @@ exports.createPost = async (req, res, next) => {
   let user_id = req.user.id;
   let title = req.body.title;
   let body = req.body.body;
-  let query = "insert into lcp_post (title, body) values (? , ?) ";
+  let query = "insert into lcp_post (user_id, title, body) values (?, ? , ?) ";
   let data = [user_id, title, body];
 
   try {
@@ -53,13 +49,15 @@ exports.createPost = async (req, res, next) => {
     return;
   }
 };
+
 // @desc    메모 수정하기
-// @route   PUT /api/v1/posts/:id
-// @request id(auth)
+// @route   PUT /api/v1/posts/:post_id
+// @request user_id(auth)
 // @body    {title:"안녕", body:"좋다"}
 exports.updatePost = async (req, res, next) => {
   let post_id = req.params.post_id;
   let user_id = req.user.id;
+  let post_num = req.params.post_num;
   let title = req.body.title;
   let body = req.body.body;
   // 이 사람의 포스팅을 변경하는지 확인 한다.
@@ -77,12 +75,12 @@ exports.updatePost = async (req, res, next) => {
     return;
   }
 
-  query = `update lcp_post 
-                set title = "${title}", 
-                body = "${body}" 
-                where id = ${id} `;
+  query = `update lcp_post post_num = ?
+                set title = ?, 
+                body = ? 
+                where id = ?`;
 
-  data = [post_id, title, body];
+  data = [post_num, title, body];
   try {
     [result] = await connection.query(query, data);
     res.status(200).json({ success: true });
@@ -101,7 +99,7 @@ exports.updatePost = async (req, res, next) => {
 exports.deletePost = async (req, res, next) => {
   let post_id = req.params.post_id;
   let user_id = req.user.id;
-  if (!id) {
+  if (!post_id || !user_id) {
     res.status(400).json({ message: "삭제할수 없습니다." });
     return;
   }
@@ -119,7 +117,7 @@ exports.deletePost = async (req, res, next) => {
     res.status(500).json();
     return;
   }
-
+  // 확인 완료 했으면 삭제하기
   query = `delete from lcp_post where id = ? `;
   data = [post_id];
   try {
