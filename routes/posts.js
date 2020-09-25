@@ -9,8 +9,8 @@ const {
 } = require("../controllers/posts");
 
 // api/v1/posts
-router.route("/").get(auth, getAllPost).post(auth, createPost);
-
-router.route("/:id").put(auth, updatePost).delete(auth, deletePost);
+router.route("/me").get(auth, getAllPost);
+router.route("/").post(auth, createPost);
+router.route("/:post_id").put(auth, updatePost).delete(auth, deletePost);
 
 module.exports = router;
