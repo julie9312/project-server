@@ -22,11 +22,11 @@ const auth = async (req, res, next) => {
 
   //user_id 랑 토큰을 가지고 커리를 한다
 
-  let query = `select u.id, t.token
+  let query = `select u.id, t.token, u.email
   from lcp_user as u
   join lcp_token as t 
   on t.user_id = u.id
-  where t.user_id =? `;
+  where t.user_id =? and t.token =? `;
 
   let data = [user_id, token];
 
