@@ -23,16 +23,11 @@ exports.createUser = async (req, res, next) => {
   let query = `insert into lcp_user (email, passwd) values ("${email}" , "${hashedPasswd}")`;
   let data = [email, hashedPasswd];
   let user_id;
-
-  const conn = await connection.getConnection();
-  await conn.beginTransaction();
-
   try {
-    [result] = await connection.query(query);
-    console.log(result);
+    [result] = await connection.query(query, data);
     user_id = result.insertId;
   } catch (e) {
-    res.status(500);
+    res.status(500).json();
     return;
   }
 
@@ -45,11 +40,9 @@ exports.createUser = async (req, res, next) => {
   try {
     [result] = await connection.query(query, data);
   } catch (e) {
-    res.status(500).json({ hi: 2, e });
+    res.status(500).json({});
     return;
   }
-  await conn.commit();
-  await conn.release();
 
   res.status(200).json({ success: true, token: token });
 };
@@ -61,6 +54,11 @@ exports.loginUser = async (req, res, next) => {
   let email = req.body.email;
   let passwd = req.body.passwd;
 
+  if (!email || !passwd) {
+    res.status(400).json();
+    return;
+  }
+
   let query = `select * from lcp_user where email = ?`;
   let data = [email];
   let user_id;
@@ -70,7 +68,7 @@ exports.loginUser = async (req, res, next) => {
     user_id = rows[0].id;
     const isMatch = await bcrypt.compare(passwd, hashedPasswd);
     if (isMatch == false) {
-      res.status(401).json();
+      res.status(400).json();
       return;
     }
   } catch (e) {

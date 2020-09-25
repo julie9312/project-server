@@ -36,10 +36,11 @@ exports.getAllPost = async (req, res, next) => {
 // @route   POST /api/v1/posts
 // @body    {title:"안녕", body:"좋다"}
 exports.createPost = async (req, res, next) => {
+  let user_id = req.user.id;
   let title = req.body.title;
   let body = req.body.body;
   let query = "insert into lcp_post (title, body) values (? , ?) ";
-  let data = [title, body];
+  let data = [user_id, title, body];
 
   try {
     [result] = await connection.query(query, data);
