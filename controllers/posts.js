@@ -56,13 +56,13 @@ exports.createPost = async (req, res, next) => {
 // @request user_id(auth)
 // @body    {title:"안녕", content:"싫다"}
 exports.updatePost = async (req, res, next) => {
+  let post_id = req.params.post_id;
   let user_id = req.user.id;
-  let post_num = req.params.post_num;
   let title = req.body.title;
   let content = req.body.content;
   // 이 사람의 포스팅을 변경하는지 확인 한다.
   let query = `select * from lcp_post where id = ?`;
-  let data = [user_id];
+  let data = [post_id];
 
   try {
     [rows] = await connection.query(query, data);
@@ -80,7 +80,7 @@ exports.updatePost = async (req, res, next) => {
                 content = ? 
                 where id = ?`;
 
-  data = [id, title, content];
+  data = [title, content, post_id];
   try {
     [result] = await connection.query(query, data);
     res.status(200).json({ success: true });
@@ -105,12 +105,13 @@ exports.deletePost = async (req, res, next) => {
   }
 
   // 이 사람의 포스팅이 맞는지 확인
-  let query = `delete from lcp_post where id = ${id}`;
+  let query = `select * from lcp_post where id = ?`;
   let data = [post_id];
   try {
     [rows] = await connection.query(query, data);
+    // 다른사람 포스팅이면, 401로 보낸다.
     if (rows[0].user_id != user_id) {
-      req.status(400).json();
+      req.status(401).json();
       return;
     }
   } catch (e) {
