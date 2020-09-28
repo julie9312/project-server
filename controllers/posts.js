@@ -30,13 +30,14 @@ exports.getAllPost = async (req, res, next) => {
 
 // @desc    메모 생성하기
 // @route   POST /api/v1/posts
-// @body    {title:"안녕", body:"좋다"}
+// @body    {title:"안녕", content:"좋다"}
 exports.createPost = async (req, res, next) => {
   let user_id = req.user.id;
   let title = req.body.title;
-  let body = req.body.body;
-  let query = "insert into lcp_post (user_id, title, body) values (?, ? , ?) ";
-  let data = [user_id, title, body];
+  let content = req.body.content;
+  let query =
+    "insert into lcp_post (user_id, title, content) values (?, ? , ?) ";
+  let data = [user_id, title, content];
 
   try {
     [result] = await connection.query(query, data);
@@ -53,16 +54,15 @@ exports.createPost = async (req, res, next) => {
 // @desc    메모 수정하기
 // @route   PUT /api/v1/posts/:post_id
 // @request user_id(auth)
-// @body    {title:"안녕", body:"좋다"}
+// @body    {title:"안녕", content:"싫다"}
 exports.updatePost = async (req, res, next) => {
-  let post_id = req.params.post_id;
   let user_id = req.user.id;
   let post_num = req.params.post_num;
   let title = req.body.title;
-  let body = req.body.body;
+  let content = req.body.content;
   // 이 사람의 포스팅을 변경하는지 확인 한다.
   let query = `select * from lcp_post where id = ?`;
-  let data = [post_id];
+  let data = [user_id];
 
   try {
     [rows] = await connection.query(query, data);
@@ -75,12 +75,12 @@ exports.updatePost = async (req, res, next) => {
     return;
   }
 
-  query = `update lcp_post post_num = ?
+  query = `update lcp_post 
                 set title = ?, 
-                body = ? 
+                content = ? 
                 where id = ?`;
 
-  data = [post_num, title, body];
+  data = [id, title, content];
   try {
     [result] = await connection.query(query, data);
     res.status(200).json({ success: true });
