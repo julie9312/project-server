@@ -23,8 +23,8 @@ const auth = async (req, res, next) => {
   //user_id 랑 토큰을 가지고 커리를 한다
 
   let query = `select u.id, t.token, u.email
-  from lcp_user as u
-  join lcp_token as t 
+  from lcp_token as t
+  join lcp_user as u 
   on t.user_id = u.id
   where t.user_id =? and t.token =? `;
 
@@ -33,7 +33,7 @@ const auth = async (req, res, next) => {
   try {
     [rows] = await connection.query(query, data);
     if (rows.length == 0) {
-      res.status(400).json();
+      res.status(401).json();
       return;
     } else {
       req.user = rows[0];

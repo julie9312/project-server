@@ -16,7 +16,7 @@ exports.getAllPost = async (req, res, next) => {
     res.status(400).json({ message: "파라미터가 잘 못 되었습니다." });
     return;
   }
-  let query = `select * from lcp_post where user_id = ? limit ? ,? ;`;
+  let query = `select * from lcp_post where user_id = ? order by id desc limit ?,?;`;
   let data = [user_id, Number(offset), Number(limit)];
   try {
     [rows] = await connection.query(query, data);
