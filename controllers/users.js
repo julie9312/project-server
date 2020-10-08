@@ -21,7 +21,7 @@ exports.createUser = async (req, res, next) => {
   // npm bcryptjs
   const hashedPasswd = await bcrypt.hash(passwd, 8);
 
-  let query = `insert into lcp_user (email, passwd, passwd_hint) values ("${email}" , "${hashedPasswd}", "${passwd_hint}")`;
+  let query = `insert into lcp_user (email, passwd, passwd_hint) values (?,?,?)`;
   let data = [email, hashedPasswd, passwd_hint];
   let user_id;
   try {
@@ -98,7 +98,7 @@ exports.logout = async (req, res, next) => {
   let user_id = req.user.id;
   let token = req.user.token;
 
-  let query = "delete from lcp_token where user_id = ? and token = ? ";
+  let query = `delete from lcp_token where user_id = ? and token = ? `;
   let data = [user_id, token];
   try {
     [result] = await connection.query(query, data);
@@ -114,19 +114,19 @@ exports.logout = async (req, res, next) => {
 // @response  success, passwd
 
 exports.passwdInit = async (req, res, next) => {
-  let user_id = req.user.id;
-  let passwdHint = req.body.passwdHint;
+  let email = req.body.email;
+  let passwd_hint = req.body.passwd_hint;
 
-  let query = "select passwd_hint from where lcp_user where email = ? ";
+  let query = `select passwd_hint from lcp_user where email = "${email}" `;
   let data = [email];
   try {
     [rows] = await connection.query(query, data);
-    if (rows[0].passwd_hint !== passwdHint) {
-      res.status(401).json();
+    if (rows[0].passwd_hint !== passwd_hint) {
+      res.status(401).json({ success: false, rows });
       return;
     }
   } catch (e) {
-    res.status(500).json();
+    res.status(500).json({ error: e });
     return;
   }
 
@@ -135,7 +135,7 @@ exports.passwdInit = async (req, res, next) => {
   let newPasswd = Math.random().toString(36).substr(2, 6);
   const hashedPasswd = await bcrypt.hash(newPasswd, 8);
 
-  query = "update lcp_user set passwd = ? where email = ? ";
+  query = `update lcp_user set passwd = ? where email = ? `;
 
   data = [hashedPasswd, email];
 
@@ -144,7 +144,7 @@ exports.passwdInit = async (req, res, next) => {
     res.status(200).json({ success: true, passwd: newPasswd });
     return;
   } catch (e) {
-    res.status(500).json();
+    res.status(500).json({ error: h });
     return;
   }
 };
