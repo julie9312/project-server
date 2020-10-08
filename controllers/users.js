@@ -106,3 +106,44 @@ exports.logout = async (req, res, next) => {
     res.status(555).json();
   }
 };
+
+// @desc    비밀번호 초기화
+// @route   PUT/api/v1/users/passwd
+// @request email, passwdHint
+// @response  success, passwd
+
+exports.passwdInit = async (req, res, next) => {
+  let user_id = req.user.id;
+  let passwdHint = req.body.passwdHint;
+
+  let query = "select passwd_hint from where lcp_user where email = ? ";
+  let data = [email];
+  try {
+    [rows] = await connection.query(query, data);
+    if (rows[0].passwd_hint !== passwdHint) {
+      res.status(401).json();
+      return;
+    }
+  } catch (e) {
+    res.status(500).json();
+    return;
+  }
+
+  // 랜덤으로 문자열 생성 (6자리)
+
+  let newPasswd = Math.random().toString(36).substr(2, 6);
+  const hashedPasswd = await bcrypt.hash(newPasswd, 8);
+
+  query = "update lcp_user set passwd = ? where email = ? ";
+
+  data = [hashedPasswd, email];
+
+  try {
+    [result] = await connection.query(query, data);
+    res.status(200).json({ success: true, passwd: newPasswd });
+    return;
+  } catch (e) {
+    res.status(500).json();
+    return;
+  }
+};
