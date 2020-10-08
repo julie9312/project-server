@@ -10,6 +10,7 @@ const connection = require("../db/mysql_connection");
 exports.createUser = async (req, res, next) => {
   let email = req.body.email;
   let passwd = req.body.passwd;
+  let passwd_hint = req.body.passwd_hint;
 
   // npm validator
   if (!validator.isEmail(email)) {
@@ -20,8 +21,8 @@ exports.createUser = async (req, res, next) => {
   // npm bcryptjs
   const hashedPasswd = await bcrypt.hash(passwd, 8);
 
-  let query = `insert into lcp_user (email, passwd) values ("${email}" , "${hashedPasswd}")`;
-  let data = [email, hashedPasswd];
+  let query = `insert into lcp_user (email, passwd, passwd_hint) values ("${email}" , "${hashedPasswd}", "${passwd_hint}")`;
+  let data = [email, hashedPasswd, passwd_hint];
   let user_id;
   try {
     [result] = await connection.query(query, data);
