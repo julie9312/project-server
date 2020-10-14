@@ -41,7 +41,7 @@ exports.createUser = async (req, res, next) => {
   try {
     [result] = await connection.query(query, data);
   } catch (e) {
-    res.status(500).json({});
+    res.status(500).json({error :e});
     return;
   }
 
@@ -69,11 +69,11 @@ exports.loginUser = async (req, res, next) => {
     user_id = rows[0].id;
     const isMatch = await bcrypt.compare(passwd, hashedPasswd);
     if (isMatch == false) {
-      res.status(400).json();
+      res.status(400).json({success: false, msg:  "login error"});
       return;
     }
   } catch (e) {
-    res.status(500).json();
+    res.status(500).json({error : e});
     return;
   }
   const token = jwt.sign({ user_id: user_id }, process.env.ACCESS_TOKEN_SECRET);
@@ -83,7 +83,7 @@ exports.loginUser = async (req, res, next) => {
     [result] = await connection.query(query, data);
     res.status(200).json({ success: true, token: token });
   } catch (e) {
-    res.status(500).json({ e });
+    res.status(500).json({error : e});
   }
 };
 
@@ -104,12 +104,12 @@ exports.logout = async (req, res, next) => {
     [result] = await connection.query(query, data);
     res.status(200).json({ success: true });
   } catch (e) {
-    res.status(555).json();
+    res.status(500).json({success :false, error :e });
   }
 };
 
 // @desc    비밀번호 초기화
-// @route   PUT/api/v1/users/passwd
+// @route   PUT/api/v1/users/email
 // @request email, passwdHint
 // @response  success, passwd
 
@@ -144,7 +144,7 @@ exports.passwdInit = async (req, res, next) => {
     res.status(200).json({ success: true, passwd: newPasswd });
     return;
   } catch (e) {
-    res.status(500).json({ error: h });
+    res.status(500).json({ error: e });
     return;
   }
 };

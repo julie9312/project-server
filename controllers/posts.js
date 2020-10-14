@@ -23,7 +23,7 @@ exports.getAllPost = async (req, res, next) => {
     res.status(200).json({ success: true, items: rows, cnt: rows.length });
     return;
   } catch (e) {
-    res.status(500).json();
+    res.status(500).json({error :e});
     return;
   }
 };
