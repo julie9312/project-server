@@ -86,7 +86,7 @@ exports.updatePost = async (req, res, next) => {
     res.status(200).json({ success: true });
     return;
   } catch (e) {
-    res.status(500).json();
+    res.status(500).json({error : e});
     return;
   }
 };
@@ -100,7 +100,7 @@ exports.deletePost = async (req, res, next) => {
   let post_id = req.params.post_id;
   let user_id = req.user.id;
   if (!post_id || !user_id) {
-    res.status(400).json({ message: "삭제할수 없습니다." });
+    res.status(400).json({ error :e , message: "삭제할수 없습니다." });
     return;
   }
 
@@ -111,11 +111,11 @@ exports.deletePost = async (req, res, next) => {
     [rows] = await connection.query(query, data);
     // 다른사람 포스팅이면, 401로 보낸다.
     if (rows[0].user_id != user_id) {
-      req.status(401).json();
+      req.status(401).json({error : e});
       return;
     }
   } catch (e) {
-    res.status(500).json();
+    res.status(500).json({error :e});
     return;
   }
   // 확인 완료 했으면 삭제하기
