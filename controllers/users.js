@@ -18,7 +18,7 @@ exports.createUser = async (req, res, next) => {
     return;
   }
 
-  // npm bcryptjs
+  // npm bcryptjs.
   const hashedPasswd = await bcrypt.hash(passwd, 8);
 
   let query = `insert into lcp_user (email, passwd, passwd_hint) values (?,?,?)`;
